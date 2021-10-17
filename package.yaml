@@ -43,6 +43,16 @@ executables:
     dependencies:
     - ao-compiler
 
+  post-machine:
+    main:                post.hs
+    source-dirs:         app/Ch2
+    ghc-options:
+    - -rtsopts
+    # - -threaded
+    # - -with-rtsopts=-N
+    dependencies:
+    - ao-compiler
+
 tests:
   ao-compiler-test:
     main:                spec.hs
