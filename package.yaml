@@ -4,7 +4,7 @@ github:              "nobsun/ao-compiler"
 license:             BSD3
 author:              "Nobuo Yamashita"
 maintainer:          "nobsun@sampou.org"
-copyright:           "Copyright: (c) 2021 Nobuo Yamashita"
+copyright:           "Copyright: (c) 2021-2023 Nobuo Yamashita"
 
 extra-source-files:
 - README.md
@@ -27,6 +27,31 @@ dependencies:
 - hspec
 - doctest
 - main-tester
+- array
+- containers
+- free
+- recursion-schemes
+
+language: GHC2021
+
+default-extensions:
+- ImportQualifiedPost
+- LambdaCase
+- LexicalNegation
+- MultiWayIf
+- NPlusKPatterns
+- OverloadedStrings
+- NoStarIsType
+- TypeFamilyDependencies
+- TypeInType
+- UndecidableInstances
+
+ghc-options:
+- -Wall
+- -Wno-unticked-promoted-constructors
+- -Wno-unused-imports
+- -Wno-unused-top-binds
+- -Wno-orphans
 
 library:
   source-dirs: 
