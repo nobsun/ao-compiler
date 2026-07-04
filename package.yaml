@@ -84,6 +84,14 @@ executables:
     dependencies:
     - ao-compiler
 
+  turing:
+    main:               Main.hs
+    source-dirs:        app/turing
+    ghc-options:
+    - -rtsopts
+    dependencies:
+    - ao-compiler
+
   ao-compiler:
     main:                 Main.hs              
     source-dirs:          app

@@ -1,5 +1,5 @@
--- # Main 雛形
---
+-- # Main
+-- 「チューリング言語」
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE GHC2024 #-}
 {-# LANGUAGE ImplicitParams #-}
@@ -14,7 +14,15 @@ module Main
     ( main
     ) where
 
+import Language.Turing.TM
+import Language.Turing.Eval
+
 main :: IO ()
-main = do
-    { return ()
-    }
+main = print (tp0, eval pAddOne tp0)
+    >> print (tp1, eval pAddOne tp1)
+
+tp0 :: Tape
+tp0 = ([I, I, I], I, [])
+
+tp1 :: Tape
+tp1 = ([I, O, I, I], I, [])
