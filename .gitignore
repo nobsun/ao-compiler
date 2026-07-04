@@ -1,0 +1,10 @@
+.stack-work/
+dist-new/
+ao-compiler.cabal
+*.log
+.curproj
+.curname
+core
+*.hi
+*.o
+*~

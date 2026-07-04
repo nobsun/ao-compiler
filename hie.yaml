@@ -1,0 +1,28 @@
+cradle:
+  stack:
+    - path: "./src"
+      component: "ao-compiler:lib"
+
+    - path: "./app/zzz/add-entry/Main.hs"
+      component: "ao-compiler:exe:add-entry"
+
+    - path: "./app/zzz/add-entry/Paths_ao_compiler.hs"
+      component: "ao-compiler:exe:add-entry"
+
+    - path: "./app/Main.hs"
+      component: "ao-compiler:exe:ao-compiler"
+
+    - path: "./app/Paths_ao_compiler.hs"
+      component: "ao-compiler:exe:ao-compiler"
+
+    - path: "./app/turing/Main.hs"
+      component: "ao-compiler:exe:turing"
+
+    - path: "./app/turing/Paths_ao_compiler.hs"
+      component: "ao-compiler:exe:turing"
+
+    - path: "./test"
+      component: "ao-compiler:test:ao-compiler-doctest"
+
+    - path: "./test"
+      component: "ao-compiler:test:ao-compiler-test"
