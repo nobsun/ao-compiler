@@ -17,6 +17,7 @@ module Language.Turing.Eval
 
 import Data.Map qualified as M
 import Language.Turing.TM
+import Debug.Trace
 {- $setup
 >>> :set -XOverloadedStrings
 -}
@@ -29,7 +30,7 @@ eval (σ, δ) tape = exec δ (σ, tape)
 
 exec :: Delta -> (Q, Tape) -> Tape
 exec δ = \ case
-    (q,tp@(ls,h,rs)) -> case δ M.!? (q,h) of
+    (q,tp@(ls,h,rs)) -> trace (show (q,tp)) $ case δ M.!? (q,h) of
         Nothing         -> tp
         Just (q', s, d) -> exec δ (q', move d (ls, s, rs))
 
@@ -38,14 +39,13 @@ move = \ case
     L -> moveL
     R -> moveR
 
-
 moveL :: Tape -> Tape
 moveL = \ case
     (ls,h,rs) -> (tl ls, hd ls, cons (h,rs))
 
 moveR :: Tape -> Tape
 moveR = \ case
-    (ls,h,rs) -> (cons (h,rs), hd rs, tl ls)
+    (ls,h,rs) -> (cons (h,ls), hd rs, tl rs)
 
 hd :: [S] -> S
 hd = \ case
