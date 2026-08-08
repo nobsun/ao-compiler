@@ -14,11 +14,6 @@ module Language.Turing.PTM
     ) where
 
 import Data.Map ( Map )
-import Data.Map qualified as M
-
-{- $setup
->>> :set -XOverloadedStrings
--}
 
 type Program = (Q, Delta)
 

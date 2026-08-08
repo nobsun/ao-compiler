@@ -7,7 +7,7 @@ module Language.Turing.Eval
     ( eval
     ) where
 
-import Data.Map qualified as M
+import Data.Map ((!?))
 import Language.Turing.TM
 import Debug.Trace
 
@@ -16,7 +16,7 @@ eval (σ, δ) tape = exec δ (σ, tape)
 
 exec :: Delta -> (Q, Tape) -> Tape
 exec δ = \ case
-    (q,tp@(ls,h,rs)) -> trace (show (q,tp)) $ case δ M.!? (q,h) of
+    (q,tp@(ls,h,rs)) -> trace (show (q,tp)) $ case δ !? (q,h) of
         Nothing         -> tp
         Just (q', s, d) -> exec δ (q', move d (ls, s, rs))
 

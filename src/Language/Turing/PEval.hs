@@ -5,10 +5,9 @@
 {-# LANGUAGE GHC2024 #-}
 module Language.Turing.PEval
     ( eval
-    , exec
     ) where
 
-import Data.Map qualified as M
+import Data.Map ( (!?) )
 import Language.Turing.PTM
 import Debug.Trace
 
@@ -17,7 +16,7 @@ eval (σ, δ) tape = exec δ (σ, tape)
 
 exec :: Delta -> (Q, Tape) -> Tape
 exec δ = \ case
-    (q,tp@(_,h,_)) -> trace (show (q,tp)) $ case δ M.!? (q,h) of
+    (q,tp@(_,h,_)) -> trace (show (q,tp)) $ case δ !? (q,h) of
         Nothing      -> tp
         Just (q', a) -> case a of
             Move d  -> exec δ (q', move  d tp)

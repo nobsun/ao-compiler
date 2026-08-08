@@ -2,25 +2,17 @@
 -- 
 -- ## 言語拡張と`module`宣言
 -- 
-{-# LANGUAGE CPP #-}
 {-# LANGUAGE GHC2024 #-}
-{-# LANGUAGE ImplicitParams #-}
-{-# LANGUAGE ImportQualifiedPost #-}
-{-# LANGUAGE LexicalNegation #-}
-{-# LANGUAGE LambdaCase, MultiWayIf #-}
-{-# LANGUAGE NPlusKPatterns #-}
-{-# LANGUAGE DataKinds, PolyKinds, NoStarIsType, TypeFamilyDependencies #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE OverloadedRecordDot, NoFieldSelectors, DuplicateRecordFields #-}
 module Language.Turing.TM
-    where
+    ( Program
+    , Q(..)
+    , Delta
+    , S(..)
+    , D(..)
+    , Tape
+    ) where
 
 import Data.Map ( Map )
-import Data.Map qualified as M
-
-{- $setup
->>> :set -XOverloadedStrings
--}
 
 type Program = (Q, Delta)
 
