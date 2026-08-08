@@ -76,9 +76,17 @@ library:
   source-dirs:            src
 
 executables:
-  turing:
+  chap3:
     main:               Main.hs
-    source-dirs:        app/turing
+    source-dirs:        app/chap3
+    ghc-options:
+    - -rtsopts
+    dependencies:
+    - ao-compiler
+
+  post:
+    main:               Main.hs
+    source-dirs:        app/chap2/post
     ghc-options:
     - -rtsopts
     dependencies:
@@ -86,7 +94,7 @@ executables:
 
   turing:
     main:               Main.hs
-    source-dirs:        app/turing
+    source-dirs:        app/chap2/turing
     ghc-options:
     - -rtsopts
     dependencies:

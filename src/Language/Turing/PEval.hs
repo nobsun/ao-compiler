@@ -1,14 +1,15 @@
--- # Language.Turing.Eval
+-- # Language.Turing.PEval
 -- 
 -- ## 言語拡張と`module`宣言
--- 
+--
 {-# LANGUAGE GHC2024 #-}
-module Language.Turing.Eval
+module Language.Turing.PEval
     ( eval
+    , exec
     ) where
 
 import Data.Map qualified as M
-import Language.Turing.TM
+import Language.Turing.PTM
 import Debug.Trace
 
 eval :: Program -> Tape -> Tape
@@ -16,9 +17,15 @@ eval (σ, δ) tape = exec δ (σ, tape)
 
 exec :: Delta -> (Q, Tape) -> Tape
 exec δ = \ case
-    (q,tp@(ls,h,rs)) -> trace (show (q,tp)) $ case δ M.!? (q,h) of
-        Nothing         -> tp
-        Just (q', s, d) -> exec δ (q', move d (ls, s, rs))
+    (q,tp@(_,h,_)) -> trace (show (q,tp)) $ case δ M.!? (q,h) of
+        Nothing      -> tp
+        Just (q', a) -> case a of
+            Move d  -> exec δ (q', move  d tp)
+            Write s -> exec δ (q', write s tp)
+
+write :: S -> Tape -> Tape
+write s = \ case
+    (ls,_,rs) -> (ls,s,rs)
 
 move :: D -> Tape -> Tape
 move = \ case
