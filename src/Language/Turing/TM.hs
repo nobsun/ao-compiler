@@ -29,7 +29,6 @@ data Q
     | H
     | S
     | P
-    | Q
     deriving (Eq, Ord, Enum, Bounded, Show, Read)
 
 type Delta = Map (Q, S) (Q, S, D)
@@ -46,24 +45,3 @@ data D
     deriving (Eq, Ord, Enum, Bounded, Show, Read)
 
 type Tape = ([S], S, [S])
-
-pAddOne :: Program
-pAddOne = (M, δ) where
-    δ = M.fromList 
-      [((M, I), (M, O, L))
-      ,((M, O), (H, I, L))
-      ,((M, B), (H, I, L))]
-
-pAddOne' :: Program
-pAddOne' = (S, δ) where
-    δ = M.fromList 
-      [((S, B), (P, B, R))
-      ,((P, I), (P, I, R))
-      ,((P, O), (P, O, R))
-      ,((P, B), (M, B, L))
-      ,((M, I), (M, O, L))
-      ,((M, O), (Q, I, L))
-      ,((M, B), (H, I, L))
-      ,((Q, I), (Q, I, L))
-      ,((Q, O), (Q, O, L))
-      ]

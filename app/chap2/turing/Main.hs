@@ -14,6 +14,8 @@ module Main
     ( main
     ) where
 
+import Data.Map qualified as M
+
 import Language.Turing.TM
 import Language.Turing.Eval
 
@@ -35,3 +37,24 @@ tp0' = ([], B, [I,I,I,I])
 
 tp1' :: Tape
 tp1' = ([], B, [I,O,I,I,I])
+
+pAddOne :: Program
+pAddOne = (M, δ) where
+    δ = M.fromList 
+      [((M, I), (M, O, L))
+      ,((M, O), (H, I, L))
+      ,((M, B), (H, I, L))]
+
+pAddOne' :: Program
+pAddOne' = (S, δ) where
+    δ = M.fromList 
+      [((S, B), (P, B, R))
+      ,((P, I), (P, I, R))
+      ,((P, O), (P, O, R))
+      ,((P, B), (M, B, L))
+      ,((M, I), (M, O, L))
+      ,((M, O), (H, I, L))
+      ,((M, B), (H, I, L))
+      ,((H, I), (H, I, L))
+      ,((H, O), (H, O, L))
+      ]

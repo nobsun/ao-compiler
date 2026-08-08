@@ -15,10 +15,22 @@ cradle:
     - path: "./app/Paths_ao_compiler.hs"
       component: "ao-compiler:exe:ao-compiler"
 
-    - path: "./app/turing/Main.hs"
+    - path: "./app/chap3/Main.hs"
+      component: "ao-compiler:exe:chap3"
+
+    - path: "./app/chap3/Paths_ao_compiler.hs"
+      component: "ao-compiler:exe:chap3"
+
+    - path: "./app/chap2/post/Main.hs"
+      component: "ao-compiler:exe:post"
+
+    - path: "./app/chap2/post/Paths_ao_compiler.hs"
+      component: "ao-compiler:exe:post"
+
+    - path: "./app/chap2/turing/Main.hs"
       component: "ao-compiler:exe:turing"
 
-    - path: "./app/turing/Paths_ao_compiler.hs"
+    - path: "./app/chap2/turing/Paths_ao_compiler.hs"
       component: "ao-compiler:exe:turing"
 
     - path: "./test"
