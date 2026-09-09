@@ -1,4 +1,4 @@
--- # Main
+-- # 2章 
 -- Postスタイル「チューリング言語」
 {-# LANGUAGE GHC2024 #-}
 module Main 
