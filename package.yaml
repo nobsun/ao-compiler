@@ -30,7 +30,7 @@ dependencies:
 - doctest
 - aeson
 - gloss
-- array
+- array 
 - containers
 - constraints
 - fgl
@@ -76,6 +76,22 @@ library:
   source-dirs:            src
 
 executables:
+  alexer:
+    main:               Main.hs
+    source-dirs:        app/alexer
+    ghc-options:
+    - -rtsopts
+    dependencies:
+    - ao-compiler
+
+  lexer:
+    main:               Main.hs
+    source-dirs:        app/lexer
+    ghc-options:
+    - -rtsopts
+    dependencies:
+    - ao-compiler
+
   chap3:
     main:               Main.hs
     source-dirs:        app/chap3

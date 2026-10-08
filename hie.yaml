@@ -9,6 +9,12 @@ cradle:
     - path: "./app/zzz/add-entry/Paths_ao_compiler.hs"
       component: "ao-compiler:exe:add-entry"
 
+    - path: "./app/alexer/Main.hs"
+      component: "ao-compiler:exe:alexer"
+
+    - path: "./app/alexer/Paths_ao_compiler.hs"
+      component: "ao-compiler:exe:alexer"
+
     - path: "./app/Main.hs"
       component: "ao-compiler:exe:ao-compiler"
 
@@ -20,6 +26,12 @@ cradle:
 
     - path: "./app/chap3/Paths_ao_compiler.hs"
       component: "ao-compiler:exe:chap3"
+
+    - path: "./app/lexer/Main.hs"
+      component: "ao-compiler:exe:lexer"
+
+    - path: "./app/lexer/Paths_ao_compiler.hs"
+      component: "ao-compiler:exe:lexer"
 
     - path: "./app/chap2/post/Main.hs"
       component: "ao-compiler:exe:post"
