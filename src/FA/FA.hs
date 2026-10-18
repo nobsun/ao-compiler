@@ -19,6 +19,7 @@ module FA.FA
     ) where
 
 import Data.Bool
+import Data.Maybe
 import Data.Map qualified as M
 import Data.Set qualified as S
 
@@ -54,39 +55,66 @@ data DFA
     }
     deriving (Eq, Show)
 
-{- $ setup
->>> let ?nfa = sampleNFA
+{-
+>>> toDFA sampleNFA
 -}
 toDFA :: NFA -> DFA
-toDFA nfa = let ?nfa = nfa in
-    let { aa       = εCl (S.singleton nfa.nq₀)
-        ; (qqs,δδ) = subsets (S.singleton aa, S.empty, M.empty)
-        ; ff       = undefined
-        } 
-    in  DFA { dQQs = qqs
-            , dΣ   = nfa.nΣ
-            , dΔ   = δδ
-            , dQs₀ = aa
-            , dFs  = ff
-            }
+toDFA nfa = let { ?nfa = nfa } in
+    let { ?aa      = εCl (S.singleton nfa.nq₀) } in
+        let { (qqs,δδ) = subsets (S.singleton ?aa, S.empty, M.empty)
+            ; ff       = undefined
+            } 
+        in  DFA { dQQs = qqs
+                , dΣ   = nfa.nΣ
+                , dΔ   = δδ
+                , dQs₀ = ?aa
+                , dFs  = ff
+                }
 
-subsets :: (?nfa :: NFA) => (QQs, QQs, ΔΔ) -> (QQs, ΔΔ)
-subsets = undefined
+subsets :: (?nfa :: NFA, ?aa :: Qs) => (QQs, QQs, ΔΔ) -> (QQs, ΔΔ)
+subsets = \ case
+    (qq, qq2, dd)
+        | S.null qq -> (qq2, dd)
+        | otherwise -> case qq `S.difference` (S.singleton ?aa) of
+            qq1 -> subsets (addQ ?aa (qq1,qq2,dd))
+        
+addQ :: (?nfa :: NFA) => Qs -> (QQs,QQs,ΔΔ) -> (QQs,QQs,ΔΔ)
+addQ aa = \ case
+    (qq1,qq2,dd) -> case foldl' phi (qq1, M.empty) ?nfa.nΣ of
+        (qq1',o') -> (qq1', S.insert aa qq2, M.insert aa o' dd)
+        where
+            phi (qq, o) s = addS (aa, s) (qq, qq2, o)
 
-εCl :: (?nfa :: NFA) => Qs -> Qs
-εCl qs = qs `S.union` foldl' phi S.empty qs
+addS :: (?nfa :: NFA) => (Qs, S) -> (QQs, QQs, Ω) -> (QQs, Ω)
+addS (aa, s) (qq1,qq2,o) = (qq1', M.insert s aa' o)
     where
-        δ = ?nfa.nδ
-        phi s q = case δ M.!? q of
-            Nothing -> s
-            Just o  -> case o M.!? ε of
-                Nothing  -> s
-                Just rs  -> rs
+        qq1' = bool (S.insert aa' qq1) qq1
+                    (S.member aa' (S.unions [S.singleton aa, qq1, qq2 ])) 
+        aa'  = δD aa s
 {-
->>> closure 
+>>> qs0 = S.singleton sampleNFA.nq₀
+>>> let ?nfa = sampleNFA in εCl qs0
+fromList [0]
+>>> let ?nfa = sampleNFA in εCl (S.singleton 1)
+fromList [1,2,4]
 -}
-closure :: (?nfa :: NFA) => Qs -> Qs
-closure p = εCl (undefined (εCl p))
+εCl :: (?nfa :: NFA) => Qs -> Qs
+εCl qs = iter qs qs
+    where
+        iter as bs = case foldl' phi S.empty bs of
+            bs'       -> case S.difference bs' as of
+                bs'' | S.null bs'' -> as
+                     | otherwise   -> iter (S.union as bs'') bs''
+        phi xs x = S.union xs (transition x ε)
+{-
+-}
+transition :: (?nfa :: NFA) => Q -> S -> Qs
+transition q s = maybe S.empty (fromMaybe S.empty . (M.!? s)) (?nfa.nδ M.!? q)
+
+δD :: (?nfa :: NFA) => Qs -> S -> Qs
+δD p s = εCl (foldl' phi S.empty (εCl p))
+    where
+        phi a q = S.union a (transition q s)
 
 sampleNFA :: NFA
 sampleNFA = NFA
