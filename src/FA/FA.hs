@@ -23,6 +23,11 @@ import Data.Maybe
 import Data.Map qualified as M
 import Data.Set qualified as S
 
+import Debug.Trace qualified as Debug
+
+_DEBUG :: Bool
+_DEBUG = () == ()
+
 type Q  = Int
 type S  = String
 ε :: S
@@ -57,39 +62,54 @@ data DFA
 
 {-
 >>> toDFA sampleNFA
+DFA {dQQs = fromList [fromList [0],fromList [1,2,4],fromList [2,3,4],fromList [2,3,4,5],fromList [2,3,4,6]], dΣ = fromList ["","a","b"], dΔ = fromList [(fromList [0],fromList [("a",fromList [1,2,4])]),(fromList [1,2,4],fromList [("a",fromList [2,3,4,5]),("b",fromList [2,3,4])]),(fromList [2,3,4],fromList [("a",fromList [2,3,4,5]),("b",fromList [2,3,4])]),(fromList [2,3,4,5],fromList [("a",fromList [2,3,4,5]),("b",fromList [2,3,4,6])]),(fromList [2,3,4,6],fromList [("a",fromList [2,3,4,5]),("b",fromList [2,3,4])])], dQs₀ = fromList [0], dFs = fromList [2,3,4,6]}
 -}
 toDFA :: NFA -> DFA
 toDFA nfa = let { ?nfa = nfa } in
-    let { ?aa      = εCl (S.singleton nfa.nq₀) } in
-        let { (qqs,δδ) = subsets (S.singleton ?aa, S.empty, M.empty)
-            ; ff       = undefined
-            } 
-        in  DFA { dQQs = qqs
-                , dΣ   = nfa.nΣ
-                , dΔ   = δδ
-                , dQs₀ = ?aa
-                , dFs  = ff
-                }
+    let { (qqs,δδ) = subsets (S.singleton aa, S.empty, M.empty)
+        ; aa       = εCl (S.singleton nfa.nq₀)
+        ; ff       = foldl' phi S.empty qqs
+            where
+                phi a qs = bool (a `S.union` qs) a (S.null (S.intersection nfa.nFs qs))
+        } 
+    in  DFA { dQQs = qqs
+            , dΣ   = nfa.nΣ
+            , dΔ   = δδ
+            , dQs₀ = aa
+            , dFs  = ff
+            }
+{- $setup
+>>> nfa0 = sampleNFA
+>>> a0   = let ?nfa = nfa0 in εCl (S.singleton nfa0.nq₀)
+>>> aa0  = S.singleton a0
+-}
 
-subsets :: (?nfa :: NFA, ?aa :: Qs) => (QQs, QQs, ΔΔ) -> (QQs, ΔΔ)
-subsets = \ case
-    (qq, qq2, dd)
-        | S.null qq -> (qq2, dd)
-        | otherwise -> case qq `S.difference` (S.singleton ?aa) of
-            qq1 -> subsets (addQ ?aa (qq1,qq2,dd))
-        
+{-
+>>> let ?nfa = nfa0 in subsets (aa0, S.empty, M.empty)
+(fromList [fromList [0],fromList [1,2,4],fromList [2,3,4],fromList [2,3,4,5],fromList [2,3,4,6]],fromList [(fromList [0],fromList [("a",fromList [1,2,4])]),(fromList [1,2,4],fromList [("a",fromList [2,3,4,5]),("b",fromList [2,3,4])]),(fromList [2,3,4],fromList [("a",fromList [2,3,4,5]),("b",fromList [2,3,4])]),(fromList [2,3,4,5],fromList [("a",fromList [2,3,4,5]),("b",fromList [2,3,4,6])]),(fromList [2,3,4,6],fromList [("a",fromList [2,3,4,5]),("b",fromList [2,3,4])])])
+-}
+subsets :: (?nfa :: NFA) => (QQs, QQs, ΔΔ) -> (QQs, ΔΔ)
+subsets (qq, qq2, dd) = bool (subsets (addQ aa (qq1,qq2,dd))) (qq2, dd) (S.null qq)
+    where
+        (aa, qq1) = S.deleteFindMin qq
+{-
+>>> let ?nfa = nfa0 in addQ a0 (S.empty, S.empty, M.empty)
+(fromList [fromList [1,2,4]],fromList [fromList [0]],fromList [(fromList [0],fromList [("a",fromList [1,2,4])])])
+-}        
 addQ :: (?nfa :: NFA) => Qs -> (QQs,QQs,ΔΔ) -> (QQs,QQs,ΔΔ)
 addQ aa = \ case
     (qq1,qq2,dd) -> case foldl' phi (qq1, M.empty) ?nfa.nΣ of
-        (qq1',o') -> (qq1', S.insert aa qq2, M.insert aa o' dd)
+        (qq1',o')    -> (qq1', S.insert aa qq2, M.insert aa o' dd)
         where
-            phi (qq, o) s = addS (aa, s) (qq, qq2, o)
+            phi (qq, o) = \ case
+                s | s == ε    -> (qq, o)
+                  | otherwise -> addS (aa, s) (qq, qq2, o)
 
 addS :: (?nfa :: NFA) => (Qs, S) -> (QQs, QQs, Ω) -> (QQs, Ω)
 addS (aa, s) (qq1,qq2,o) = (qq1', M.insert s aa' o)
     where
         qq1' = bool (S.insert aa' qq1) qq1
-                    (S.member aa' (S.unions [S.singleton aa, qq1, qq2 ])) 
+                    (S.null aa' || S.member aa' (S.unions [S.singleton aa, qq1, qq2 ])) 
         aa'  = δD aa s
 {-
 >>> qs0 = S.singleton sampleNFA.nq₀
@@ -131,3 +151,11 @@ sampleNFA = NFA
     , nq₀ = 0
     , nFs = S.fromList [6]
     }
+
+{- debug print -}
+_trace :: String -> a -> a
+_trace | _DEBUG    = Debug.trace
+       | otherwise = const id
+
+_tracing :: Show a => a -> a
+_tracing = _trace . show <*> id
