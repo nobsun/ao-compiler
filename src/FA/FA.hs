@@ -165,7 +165,6 @@ DFA {dQQs  = fromList [fromList [0],fromList [1,2,4],fromList [2,3,4],fromList [
     , dFs  = fromList [2,3,4,6]}
 -}
 
-
 {- debug print -}
 _trace :: String -> a -> a
 _trace | _DEBUG    = Debug.trace
@@ -173,5 +172,4 @@ _trace | _DEBUG    = Debug.trace
 
 _tracing :: Show a => a -> a
 _tracing = _trace . show <*> id
-
 
