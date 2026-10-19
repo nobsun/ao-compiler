@@ -98,19 +98,18 @@ subsets (qq, qq2, dd) = bool (subsets (addQ aa (qq1,qq2,dd))) (qq2, dd) (S.null 
 -}        
 addQ :: (?nfa :: NFA) => Qs -> (QQs,QQs,ΔΔ) -> (QQs,QQs,ΔΔ)
 addQ aa = \ case
-    (qq1,qq2,dd) -> case foldl' phi (qq1, M.empty) ?nfa.nΣ of
+    (qq1,qq2,dd) -> case foldl' phi (qq1, M.empty) (S.drop 1 ?nfa.nΣ) of
         (qq1',o')    -> (qq1', S.insert aa qq2, M.insert aa o' dd)
         where
-            phi (qq, o) = \ case
-                s | s == ε    -> (qq, o)
-                  | otherwise -> addS (aa, s) (qq, qq2, o)
+            phi (qq, o) s = addS (aa, s) (qq, qq2, o)
 
 addS :: (?nfa :: NFA) => (Qs, S) -> (QQs, QQs, Ω) -> (QQs, Ω)
-addS (aa, s) (qq1,qq2,o) = (qq1', M.insert s aa' o)
+addS (as, s) (qq1,qq2,o) = (qq1', bool (M.insert s as' o) o notarget)
     where
-        qq1' = bool (S.insert aa' qq1) qq1
-                    (S.null aa' || S.member aa' (S.unions [S.singleton aa, qq1, qq2 ])) 
-        aa'  = δD aa s
+        qq1'     = bool (S.insert as' qq1) qq1
+                    (notarget || S.member as' (S.unions [S.singleton as, qq1, qq2 ])) 
+        as'      = δD as s
+        notarget = S.null as'
 {-
 >>> qs0 = S.singleton sampleNFA.nq₀
 >>> let ?nfa = sampleNFA in εCl qs0
@@ -152,6 +151,21 @@ sampleNFA = NFA
     , nFs = S.fromList [6]
     }
 
+{-
+toDFA sampleNFA → 
+
+DFA {dQQs  = fromList [fromList [0],fromList [1,2,4],fromList [2,3,4],fromList [2,3,4,5],fromList [2,3,4,6]]
+    , dΣ   = fromList ["","a","b"]
+    , dΔ   =  fromList [(fromList [0]      ,fromList [("a",fromList [1,2,4])])
+                       ,(fromList [1,2,4]  ,fromList [("a",fromList [2,3,4,5]),("b",fromList [2,3,4])])
+                       ,(fromList [2,3,4]  ,fromList [("a",fromList [2,3,4,5]),("b",fromList [2,3,4])])
+                       ,(fromList [2,3,4,5],fromList [("a",fromList [2,3,4,5]),("b",fromList [2,3,4,6])])
+                       ,(fromList [2,3,4,6],fromList [("a",fromList [2,3,4,5]),("b",fromList [2,3,4])])]
+    , dQs₀ = fromList [0]
+    , dFs  = fromList [2,3,4,6]}
+-}
+
+
 {- debug print -}
 _trace :: String -> a -> a
 _trace | _DEBUG    = Debug.trace
@@ -159,3 +173,5 @@ _trace | _DEBUG    = Debug.trace
 
 _tracing :: Show a => a -> a
 _tracing = _trace . show <*> id
+
+
